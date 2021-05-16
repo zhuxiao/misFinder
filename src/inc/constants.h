@@ -15,8 +15,8 @@
 #define NULL ((void *)0)
 #endif
 
-#define MISFINDER_VERSION_STR			("v0.4.05.05")
-#define MISFINDER_RELEASE_DATE_STR		("Oct 17, 2015")
+#define MISFINDER_VERSION_STR			("v0.4.05.06")
+#define MISFINDER_RELEASE_DATE_STR		("May 16, 2021")
 
 
 #define DEBUG_SCAF_OVERLAP_FLAG		(NO)
@@ -86,6 +86,7 @@
 #define QUERY_ID_SKIP_NUM			6
 #define QUERY_LEN_SKIP_NUM			7
 #define SUBJECT_HEAD_SKIP_NUM		8
+#define ALT_SUBJECT_HEAD_SKIP_NUM	1
 #define SUBJECT_LEN_SKIP_NUM		7
 #define SCORE_SKIP_NUM				8
 #define IDENTITY_SKIP_NUM			13

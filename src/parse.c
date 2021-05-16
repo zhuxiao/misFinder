@@ -16,10 +16,10 @@
  */
 short parseBlastn(char *parseResultFile, const char *blastnResultFile)
 {
-	int j, len, fileStatus, matchFlag;
+	int j, len, fileStatus, matchFlag, matchFlag2, subjectSkipLen;
 	char line[LINE_CHAR_MAX+1], *pch;
 	FILE *fpBlastnRe, *fpParseResult;
-	char patStr[20][256], strandStr[2][20];
+	char patStr[20][256], strandStr[2][20], altSubPatStr[256];
 	int stage;
 	int step;
 	int stepMatchFlag;
@@ -48,6 +48,7 @@ short parseBlastn(char *parseResultFile, const char *blastnResultFile)
 	strcpy(patStr[0], "Query=");
 	strcpy(patStr[1], "Length=");
 	strcpy(patStr[2], "Subject=");
+	strcpy(altSubPatStr, ">");
 	strcpy(patStr[3], " Score =");
 	strcpy(patStr[4], " Identities =");
 	strcpy(patStr[5], " Strand=");
@@ -146,6 +147,7 @@ short parseBlastn(char *parseResultFile, const char *blastnResultFile)
 		{ // 2
 			if(len>SUBJECT_HEAD_SKIP_NUM)
 			{
+				subjectSkipLen = SUBJECT_HEAD_SKIP_NUM;
 				matchFlag = YES;
 				for(j=0; j<SUBJECT_HEAD_SKIP_NUM; j++) // check for "SUBJECT_HEAD_STAGE"
 				{
@@ -156,9 +158,23 @@ short parseBlastn(char *parseResultFile, const char *blastnResultFile)
 					}
 				}
 
+				if(matchFlag==NO){
+					subjectSkipLen = ALT_SUBJECT_HEAD_SKIP_NUM;
+					matchFlag2 = YES;
+					for(j=0; j<ALT_SUBJECT_HEAD_SKIP_NUM; j++) // check for "SUBJECT_HEAD_STAGE"
+					{
+						if(altSubPatStr[j]!=line[j])
+						{
+							matchFlag2 = NO;
+							break;
+						}
+					}
+					matchFlag = matchFlag2;
+				}
+
 				if(matchFlag==YES)
 				{
-					pch = line + SUBJECT_HEAD_SKIP_NUM;
+					pch = line + subjectSkipLen;
 					while(*pch==' ')
 					{
 						pch ++;
@@ -167,6 +183,29 @@ short parseBlastn(char *parseResultFile, const char *blastnResultFile)
 
 					stage = SUBJECT_HEAD_STAGE;
 					continue;
+				}else{
+					//...
+					//.... Lambda
+					matchFlag = YES;
+					for(j=0; j<LAMBDA_SKIP_NUM; j++) // check for "Lambda"
+					{
+						if(patStr[8][j]!=line[j])
+						{
+							matchFlag = NO;
+							break;
+						}
+					}
+
+					if(matchFlag==YES)
+					{
+						//stage = MATCH_FINISHED_STAGE;
+						stage = LAMBDA_STAGE;
+
+						// print the result
+						//fprintf(fpParseResult, "%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.4f\n", startSubjectPos, endSubjectPos, startQueryPos, endQueryPos, strand, matchLen, totalMatchLen, gapNum, matchPercent);
+
+						continue;
+					}
 				}
 			}
 		}else if(stage==SUBJECT_HEAD_STAGE)

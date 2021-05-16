@@ -1242,13 +1242,13 @@ short fillQueries(queryMatchInfo_t *queryMatchInfoSet, char *inputQueryFile)
 				return FAILED;
 			}
 			strcpy(queryArray[queryID-1].querySeq, querySeq);
-		}else
-		{
-			printf("line=%d, In %s(), cannot get the potential mis-assembled queries, error!\n", __LINE__, __func__);
-			return FAILED;
+			queryID ++;
 		}
-
-		queryID ++;
+//		else
+//		{
+//			printf("line=%d, In %s(), cannot get the potential mis-assembled queries, error!\n", __LINE__, __func__);
+//		//	return FAILED;
+//		}
 	}
 
 	free(querySeq);

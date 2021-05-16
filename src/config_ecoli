@@ -1,0 +1,17 @@
+# This is a configuration example file.
+
+QUERY
+# Assembly result file, e.g. scaffolds or contigs in fasta format.
+/media/xzhu/C90F-C76A/ecoli/scaffolds.fasta
+END
+
+REF
+# Reference segments in fasta format.
+/media/xzhu/C90F-C76A/ecoli/MG1655.fasta
+END
+
+READS
+# Paired-end reads in fastq or fasta format.
+PE=/media/xzhu/C90F-C76A/ecoli/1.fq	/media/xzhu/C90F-C76A/ecoli/2.fq
+END
+
