@@ -16,7 +16,7 @@
 #endif
 
 #define MISFINDER_VERSION_STR			("v0.4.05.07")
-#define MISFINDER_RELEASE_DATE_STR		("May 16, 2021")
+#define MISFINDER_RELEASE_DATE_STR		("May 23, 2021")
 
 
 #define DEBUG_SCAF_OVERLAP_FLAG		(NO)
