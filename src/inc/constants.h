@@ -15,7 +15,7 @@
 #define NULL ((void *)0)
 #endif
 
-#define MISFINDER_VERSION_STR			("v0.4.05.06")
+#define MISFINDER_VERSION_STR			("v0.4.05.07")
 #define MISFINDER_RELEASE_DATE_STR		("May 16, 2021")
 
 

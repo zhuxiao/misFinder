@@ -145,7 +145,7 @@ short parseBlastn(char *parseResultFile, const char *blastnResultFile)
 			}
 		}else if(stage==QUERY_LEN_STAGE)
 		{ // 2
-			if(len>SUBJECT_HEAD_SKIP_NUM)
+			if(len>SUBJECT_HEAD_SKIP_NUM || len>ALT_SUBJECT_HEAD_SKIP_NUM)
 			{
 				subjectSkipLen = SUBJECT_HEAD_SKIP_NUM;
 				matchFlag = YES;
