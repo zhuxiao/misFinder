@@ -484,6 +484,17 @@ void mapReadsOpSingleThread(threadPara_t *threadPara)
 	endReadBlockID = (endReadID - 1) / readSet->maxItemNumPerReadBlock + 1;
 
 	rid = startReadID;
+
+//	if(rid!=26127766)
+//	{
+//		free(matchResultArrays[0]);
+//		free(matchResultArrays[1]);
+//		free(matchResultArrayBuf1);
+//		free(matchResultArrayBuf2);
+//		threadPara->successFlag = SUCCESSFUL;
+//		return;
+//	}
+
 	for(i=startReadBlockID-1; i<=endReadBlockID-1; i++)
 	{
 		pReadBlockArray = readSet->readBlockArr + i;
@@ -507,10 +518,10 @@ void mapReadsOpSingleThread(threadPara_t *threadPara)
 			seqLen = pRead->seqlen;
 			autoMismatchThreshold = seqLen * 0.05;
 
-			//if(rid==31722926)
-			//{
-			//	printf("rid=%ld, seqLen=%d\n", rid, seqLen);
-			//}
+//			if(rid%10000==0)
+//			{
+//				printf("rid=%ld, seqLen=%d\n", rid, seqLen);
+//			}
 
 			if(rid%2==1)
 			{
@@ -2091,7 +2102,9 @@ short getAlignItemsFromSingleUnmatedPos(int32_t *matedNum, read_t *pRead, alignM
 		queryAlignSeqLen = endQueryPos - startQueryPos + 1;
 	}else
 	{
-		endQueryPos = queryPosBased + pReadBased->seqlen - matchItemBased->startReadPos;
+		//endQueryPos = queryPosBased + pReadBased->seqlen - matchItemBased->startReadPos;
+		//endQueryPos = queryPosBased + pReadBased->seqlen - matchItemBased->startReadPos -(pReadBased->seqlen - matchItemBased->startReadPos - matchItemBased->alignSize + 1);
+		endQueryPos = queryPosBased  + matchItemBased->alignSize - 1;
 		startQueryPos = endQueryPos - insertSize - standDev * 6;
 		if(startQueryPos<1)
 		{
@@ -2155,18 +2168,25 @@ short getAlignItemsFromSingleUnmatedPos(int32_t *matedNum, read_t *pRead, alignM
 				clipNum = readLeftShiftLen - queryLeftShiftLen;
 				mismatchNum += (readLeftShiftLen - clipNum) + readRightShiftLen;
 				startAlignReadPos = clipNum + 1;
-				endAlignReadPos = pRead->seqlen;
+				//endAlignReadPos = pRead->seqlen;
+				endAlignReadPos = pRead->seqlen - readRightShiftLen;
 				startAlignQueryPos = 1;
-				endAlignQueryPos = startAlignQueryPos + pRead->seqlen - clipNum - 1;
+				//endAlignQueryPos = startAlignQueryPos + pRead->seqlen - clipNum - 1;
+				//endAlignQueryPos = startAlignQueryPos + pRead->seqlen - clipNum - 1 - (pRead->seqlen - (endAlignReadPos-startAlignReadPos+1)-clipNum);
+				endAlignQueryPos = startAlignQueryPos + endAlignReadPos - startAlignReadPos;
 			}else if(readRightShiftLen>0 && endQueryPos+(readRightShiftLen-queryRightShiftLen)>queryItem->queryLen)
 			{ // clip at 3' end
 				softClipEnd = 2;
 				clipNum = readRightShiftLen - queryRightShiftLen;
 				mismatchNum += readLeftShiftLen + (readRightShiftLen - clipNum);
-				startAlignReadPos = 1;
+				//startAlignReadPos = 1;
+				startAlignReadPos = readLeftShiftLen + 1;
 				endAlignReadPos = pRead->seqlen - clipNum;
-				startAlignQueryPos = endQueryPos - queryRightShiftLen - (pRead->seqlen - readRightShiftLen) + 1;
-				endAlignQueryPos = endQueryPos;
+
+				//startAlignQueryPos = endQueryPos - queryRightShiftLen - (pRead->seqlen - readRightShiftLen) + 1;
+				//endAlignQueryPos = endQueryPos;
+				startAlignQueryPos = endQueryPos - queryRightShiftLen - (pRead->seqlen - readRightShiftLen - readLeftShiftLen) + 1;
+				endAlignQueryPos = endQueryPos - queryRightShiftLen;
 			}else
 			{ // no clip
 				softClipEnd = -1;
@@ -2175,6 +2195,7 @@ short getAlignItemsFromSingleUnmatedPos(int32_t *matedNum, read_t *pRead, alignM
 				startAlignReadPos = 1;
 				endAlignReadPos = pRead->seqlen;
 				startAlignQueryPos = startQueryPos + (queryLeftShiftLen - readLeftShiftLen);
+
 				endAlignQueryPos = startAlignQueryPos + pRead->seqlen - 1;
 			}
 

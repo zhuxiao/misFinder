@@ -1144,7 +1144,7 @@ short computeAlignSegMargin(int64_t *leftMargin, int64_t *rightMargin, globalVal
 	char *alignResultArray[3];
 	int32_t overlapLen, mismatchNum, queryLeftShiftLen, queryRightShiftLen, subjectLeftShiftLen, subjectRightShiftLen;
 
-	if(difQuery<-100)
+	if(difQuery<-100 && difQuery>-MAX_QUERY_OVERLAP_SIZE)
 	{
 		// get the two base sequences for the first alignment
 		if(getRightAlignSeqs(&queryAlignSeq, &subjectAlignSeq, &queryAlignSeqLen, &subjectAlignSeqLen, &leftQueryPos, &rightQueryPos, &leftSubjectPos, &rightSubjectPos, leftAlignSeg, rightAlignSeg, queryItem, subjectArray)==FAILED)

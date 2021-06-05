@@ -95,7 +95,8 @@ short getMisInfoListBreakpoint(query_t *queryItem, subject_t *subjectArray)
 			// compute the overlapped align segments of query
 			if(startSegPos==-1)
 			{
-				if(globalSegArray[i-1].subjectID!=globalSegArray[i].subjectID || globalSegArray[i-1].strand!=globalSegArray[i].strand || globalSegArray[i-1].endQueryPos>globalSegArray[i].startQueryPos || (globalSegArray[i-1].endSubPos-globalSegArray[i].startSubPos<-minDisjunctDistanceThres || globalSegArray[i-1].endSubPos-globalSegArray[i].startSubPos>minDisjunctDistanceThres))
+				//if(globalSegArray[i-1].subjectID!=globalSegArray[i].subjectID || globalSegArray[i-1].strand!=globalSegArray[i].strand || (globalSegArray[i-1].endQueryPos>globalSegArray[i].startQueryPos || (globalSegArray[i-1].endSubPos-globalSegArray[i].startSubPos<-minDisjunctDistanceThres || globalSegArray[i-1].endSubPos-globalSegArray[i].startSubPos>minDisjunctDistanceThres))
+				if(globalSegArray[i-1].subjectID!=globalSegArray[i].subjectID || globalSegArray[i-1].strand!=globalSegArray[i].strand || (globalSegArray[i-1].endQueryPos>globalSegArray[i].startQueryPos || ((globalSegArray[i-1].endQueryPos+END_IGNORE_LEN<queryItem->queryLen || globalSegArray[i].startQueryPos>END_IGNORE_LEN) && (globalSegArray[i-1].endSubPos-globalSegArray[i].startSubPos<-minDisjunctDistanceThres || globalSegArray[i-1].endSubPos-globalSegArray[i].startSubPos>minDisjunctDistanceThres))))
 				{
 					startSegPos = globalSegArray[i].startQueryPos;
 					endSegPos = globalSegArray[i-1].endQueryPos;

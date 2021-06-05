@@ -15,7 +15,7 @@
 #define NULL ((void *)0)
 #endif
 
-#define MISFINDER_VERSION_STR			("v0.4.05.07")
+#define MISFINDER_VERSION_STR			("v0.4.5.7")
 #define MISFINDER_RELEASE_DATE_STR		("May 23, 2021")
 
 
@@ -206,6 +206,10 @@
 #define UNCER_MISJOIN					9
 #define UNCER_INSERT					10
 #define UNCER_DEL						11
+
+// 2021-06-01
+#define MIN_QUERY_OVERLAP_SIZE			100
+#define MAX_QUERY_OVERLAP_SIZE			30000
 
 
 #endif /* CONSTANTS_H_ */

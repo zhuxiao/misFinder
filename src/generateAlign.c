@@ -35,11 +35,11 @@ short generateAlignResult(char *outputPathStr, char *queryMatchInfoFile, char *i
 	}
 
 	// run the blastn command to generate the alignment information
-	if(generateBlastnResult(outputPathStr, inputBlastnFile, inputQueryFile, mergedSegFile, threadNum)==FAILED)
-	{
-		printf("line=%d, In %s(), cannot generate the alignment information, error!\n", __LINE__, __func__);
-		return FAILED;
-	}
+//	if(generateBlastnResult(outputPathStr, inputBlastnFile, inputQueryFile, mergedSegFile, threadNum)==FAILED)
+//	{
+//		printf("line=%d, In %s(), cannot generate the alignment information, error!\n", __LINE__, __func__);
+//		return FAILED;
+//	}
 
 
 	// parse the input blastn file
