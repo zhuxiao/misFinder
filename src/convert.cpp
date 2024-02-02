@@ -89,6 +89,7 @@ short initMemConvertMatchInfo(queryMatchInfo_t **queryMatchInfoSet, tmpQuery_t *
 	}
 
 	(*queryMatchInfoSet)->potentMisassNum = 0;
+	(*queryMatchInfoSet)->shortQueryNum = 0;
 	(*queryMatchInfoSet)->trueMisassNum = 0;
 	(*queryMatchInfoSet)->SVNum = 0;
 
@@ -1006,7 +1007,6 @@ short loadQueryMatchInfoFromFile(queryMatchInfo_t **queryMatchInfoSet, char *que
 		printf("line=%d, In %s(), cannot read information to  binary file, error!\n", __LINE__, __func__);
 		return FAILED;
 	}
-
 
 	// allocate the memory
 	(*queryMatchInfoSet)->subjectArray = (subject_t *) calloc ((*queryMatchInfoSet)->itemNumSubjectArray, sizeof(subject_t));

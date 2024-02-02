@@ -654,7 +654,8 @@ short fillReferenceBaseFlag(metrics_t *queryMetrics, char *refDeletionFile, subj
 						//gapPercent_ch[j] = '\0';
 						//gapPercent = atof(gapPercent_ch) / 100.0;
 
-						if(totalMatchLen>=minQueryLenThres*2)
+						//if(totalMatchLen>=minQueryLenThres*2)
+						if(totalMatchLen>=SHORT_QUERY_LEN_THRES)
 							validQuerySubjectFlag = YES;
 						else
 							validQuerySubjectFlag = NO;
@@ -1412,7 +1413,7 @@ short computeLenStatistics(queryLenStatistic_t *lenStatisticArray, int64_t itemN
 	validQueryNum = 0;
 	for(i=0; i<itemNumLenStatisticArray; i++)
 	{
-		if(lenStatisticArray[i].queryLen>=minQueryLenThres)
+		//if(lenStatisticArray[i].queryLen>=minQueryLenThres)
 		{
 			totalQueryLen += lenStatisticArray[i].queryLen;
 			validQueryNum ++;
@@ -1424,7 +1425,7 @@ short computeLenStatistics(queryLenStatistic_t *lenStatisticArray, int64_t itemN
 	tmpTotalLen = 0;
 	for(i=0; i<itemNumLenStatisticArray; i++)
 	{
-		if(lenStatisticArray[i].queryLen>=minQueryLenThres)
+		//if(lenStatisticArray[i].queryLen>=minQueryLenThres)
 		{
 			tmpTotalLen += lenStatisticArray[i].queryLen;
 			if(tmpTotalLen>=N50_TotalLen)

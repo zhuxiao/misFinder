@@ -254,6 +254,7 @@ short addMisassSeqNodeToMisInfoNode(misInfo_t *misInfo, int32_t misassKind, int3
 	misassSeq->startSubjectPos = startSubjectPos;
 	misassSeq->endSubjectPos = endSubjectPos;
 	misassSeq->next = NULL;
+	misassSeq->valid_flag = true;
 
 	if(misInfo->misassSeqList)
 		misInfo->tailMisassSeq->next = misassSeq;
@@ -261,6 +262,34 @@ short addMisassSeqNodeToMisInfoNode(misInfo_t *misInfo, int32_t misassKind, int3
 		misInfo->misassSeqList = misassSeq;
 	misInfo->tailMisassSeq = misassSeq;
 	misInfo->misassSeqNum ++;
+
+	return SUCCESSFUL;
+}
+
+// validate query head and tail regions
+short validateMisRegQueryEnd(queryMatchInfo_t *queryMatchInfoSet){
+	query_t *queryItem;
+	misInfo_t *misInfo;
+	misassSeq_t *misassSeq;
+	int32_t i;
+
+	for(i=0; i<queryMatchInfoSet->itemNumQueryArray; i++){
+		queryItem = queryMatchInfoSet->queryArray + i;
+		if(queryItem->misInfoItemNum>0){
+			misInfo = queryItem->misInfoList;
+			while(misInfo){
+				misassSeq = misInfo->misassSeqList;
+				while(misassSeq){
+					// ignore items at both ends
+					if(misassSeq->startQueryPos<END_IGNORE_LEN or misassSeq->endQueryPos+END_IGNORE_LEN>queryItem->queryLen)
+						misassSeq->valid_flag = false;
+
+					misassSeq = misassSeq->next;
+				}
+				misInfo = misInfo->next;
+			}
+		}
+	}
 
 	return SUCCESSFUL;
 }

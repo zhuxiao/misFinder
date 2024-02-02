@@ -376,32 +376,33 @@ short showUsageInfo()
 	printf("    gen-conf    Create configuration file\n\n");
 
 	printf("Options:\n");
-	printf("  1) metrics -- compute the metrics:\n");
-	printf("    -m <INT>           The minimal query length. Default is 100.\n");
-	printf("    -pt <FLOAT>        The minimal identity percentage for matched queries and \n"
-		   "                       matched segments. Default is 0.95.\n");
-	printf("    -t <INT>           The number of threads for the alignment between queries \n"
-		   "                       and subjects. Default is the number of CPU cores.\n");
-	printf("    -o <STR>\n");
-	printf("    -out <STR>         Output directory for the output files. Default is \"output\".\n");
-	printf("    -h\n");
-	printf("    -help              Show help information.\n");
 
-	printf("  2) misass -- compute mis-assemblies:\n");
-	printf("    -i <INT>           Minimal indel size. Default is 5 bp.\n");
-	printf("    -t <INT>           The number of threads for reads alignment. Default is\n"
-		   "                       the number of CPU cores.\n");
-	printf("    -sc <INT>          Single-cell paired-end data flag. Default is 0.\n"
-		   "                       0: standard genomic DNA prepared from culture;\n"
-		   "                       1: single-cell data.\n");
+	printf("  1) metrics    -- compute the metrics:\n");
+	printf("    -m <INT>        The minimal query length (bp). [%d]\n", MIN_QUERY_LEN_THRES);
+	printf("    -pt <FLOAT>     The minimal identity percentage for matched queries and \n"
+		   "                    matched segments. [%g]\n", MATCHED_PERCENT_THRES);
+	printf("    -t <INT>        The number of threads for the alignment between queries \n"
+		   "                    and subjects. Default is the number of CPU cores.\n");
 	printf("    -o <STR>\n");
-	printf("    -out <STR>         Output directory for the output files. Default is \"output\".\n");
+	printf("    -out <STR>      Output directory for the output files. [%s]\n", OUTPUT_DIR_DEFAULT);
 	printf("    -h\n");
-	printf("    -help              Show help information.\n");
+	printf("    -help           Show help information.\n");
 
-	printf("  3) gen-conf -- create configuration file in current directory:\n");
+	printf("  2) misass     -- compute mis-assemblies:\n");
+	printf("    -i <INT>        Minimal indel size (bp). [%d]\n", INDEL_SIZE_DEFAULT);
+	printf("    -t <INT>        The number of threads for reads alignment. Default is\n"
+		   "                    the number of CPU cores.\n");
+	printf("    -sc <INT>       Single-cell paired-end data flag. [0]\n"
+		   "                    0: standard genomic DNA prepared from culture;\n"
+		   "                    1: single-cell data.\n");
+	printf("    -o <STR>\n");
+	printf("    -out <STR>      Output directory for the output files. [%s]\n", OUTPUT_DIR_DEFAULT);
 	printf("    -h\n");
-	printf("    -help              Show help information.\n");
+	printf("    -help           Show help information.\n");
+
+	printf("  3) gen-conf   -- create configuration file in current directory:\n");
+	printf("    -h\n");
+	printf("    -help           Show help information.\n");
 
 	printf("\nExample:\n");
 	printf("  # detect mis-assemblies based on the specified information in 'config' file \n");

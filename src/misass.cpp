@@ -107,6 +107,14 @@ short validateMisassQueries(char *outputPathStr, char *newQueryFile, char *query
 			printf("line=%d, In %s(), cannot extract mis-assembly regions, error!\n", __LINE__, __func__);
 			return FAILED;
 		}
+
+		// validate query head and tail regions
+		if(validateMisRegQueryEnd(queryMatchInfoSet)==FAILED)
+		{
+			printf("line=%d, In %s(), cannot extract mis-assembly regions, error!\n", __LINE__, __func__);
+			return FAILED;
+		}
+
 /*
 		// generate the data for Circos
 		if(generateCircosData(queryMatchInfoSet, readSetArray->readSetArray)==FAILED)
@@ -208,16 +216,19 @@ short computePotentMisassNum(queryMatchInfo_t *queryMatchInfoSet)
 
 	perfectNum = 0;
 	queryMatchInfoSet->potentMisassNum = 0;
+	queryMatchInfoSet->shortQueryNum = 0;
 	for(i=0; i<queryMatchInfoSet->itemNumQueryArray; i++)
 	{
-
-		if(queryArray[i].globalMatchKind==PERFECT_MATCH_KIND)
-			perfectNum ++;
-		else
-		{
-			queryArray[i].misassFlag = POTENTIAL_MISASS;
-			queryMatchInfoSet->potentMisassNum ++;
-		}
+		if(queryArray[i].queryLen>=minQueryLenThres){
+			if(queryArray[i].globalMatchKind==PERFECT_MATCH_KIND)
+				perfectNum ++;
+			else
+			{
+				queryArray[i].misassFlag = POTENTIAL_MISASS;
+				queryMatchInfoSet->potentMisassNum ++;
+			}
+		}else
+			queryMatchInfoSet->shortQueryNum ++;
 	}
 
 	if(queryMatchInfoSet->maxQueryID<=0)
@@ -243,7 +254,8 @@ short computePotentMisassNum(queryMatchInfo_t *queryMatchInfoSet)
 	}
 
 	printf("Number of queries perfectly aligned to reference: %d\n", perfectNum);
-	printf("Number of queries need to be further validated  : %d\n", queryMatchInfoSet->potentMisassNum);
+	printf("Number of queries need to be further validated: %d\n", queryMatchInfoSet->potentMisassNum);
+	printf("Number of short queries < %d bp that were ignored: %d\n", minQueryLenThres, queryMatchInfoSet->shortQueryNum);
 
 	return SUCCESSFUL;
 }
@@ -2663,83 +2675,80 @@ short saveMisassQueries(char *errorsFile, char *svFile, char *misUncertainFile, 
 	strcpy(nullSubjectTitle, "-");
 
 	errNum = svNum = gapNum = warningNum = 0;
-	for(i=0; i<queryMatchInfoSet->itemNumQueryArray; i++)
-	{
+	for(i=0; i<queryMatchInfoSet->itemNumQueryArray; i++){
 		queryItem = queryMatchInfoSet->queryArray + i;
-		if(queryItem->misInfoItemNum>0)
-		{
+		if(queryItem->misInfoItemNum>0 and queryItem->queryLen>minQueryLenThres){
 			misInfo = queryItem->misInfoList;
-			while(misInfo)
-			{
+			while(misInfo){
 				misassSeq = misInfo->misassSeqList;
-				while(misassSeq)
-				{
-					if(misassSeq->subjectID>0)
-						subjectTitle = subjectArray[misassSeq->subjectID-1].subjectTitle;
-					else
-						subjectTitle = nullSubjectTitle;
+				while(misassSeq){
+					if(misassSeq->valid_flag){
+						if(misassSeq->subjectID>0)
+							subjectTitle = subjectArray[misassSeq->subjectID-1].subjectTitle;
+						else
+							subjectTitle = nullSubjectTitle;
 
-					if(misInfo->misassFlag==TRUE_MISASS)
-					{
-						if(misInfo->gapFlag==NO || misInfo->misType==QUERY_MISJOIN_KIND)
+						if(misInfo->misassFlag==TRUE_MISASS)
+						{
+							if(misInfo->gapFlag==NO || misInfo->misType==QUERY_MISJOIN_KIND)
+							{
+								switch(misassSeq->misassKind)
+								{
+									case ERR_MISJOIN: strcpy(misKindStr, "err_misjoin"); break;
+									case ERR_INSERT: strcpy(misKindStr, "err_insertion"); break;
+									case ERR_DEL: strcpy(misKindStr, "err_deletion"); break;
+									default: printf("line=%d, In %s(), invalid error kind=%d, error!\n", __LINE__, __func__, misassSeq->misassKind); return FAILED;
+								}
+
+								fprintf(fpErrors, "%s\t%s\t%d\t%d\t%d\t%d\t%s\n", queryItem->queryTitle, misKindStr, misassSeq->startQueryPos, misassSeq->endQueryPos, misassSeq->startSubjectPos, misassSeq->endSubjectPos, subjectTitle);
+								errNum ++;
+							}else if(misInfo->gapFlag==YES)
+							{
+								switch(misassSeq->misassKind)
+								{
+									case GAP_INSERT: strcpy(misKindStr, "gap_insertion"); break;
+									case GAP_DEL: strcpy(misKindStr, "gap_deletion"); break;
+									default: printf("line=%d, In %s(), invalid error kind=%d, error!\n", __LINE__, __func__, misassSeq->misassKind); return FAILED;
+								}
+
+								fprintf(fpGap, "%s\t%s\t%d\t%d\t%d\t%d\t%s\n", queryItem->queryTitle, misKindStr, misassSeq->startQueryPos, misassSeq->endQueryPos, misassSeq->startSubjectPos, misassSeq->endSubjectPos, subjectTitle);
+								gapNum ++;
+							}else
+							{
+								printf("line=%d, In %s(), invalid situation, error!\n", __LINE__, __func__);
+								return FAILED;
+							}
+
+						}else if(misInfo->misassFlag==STRUCTURE_VARIATION)
 						{
 							switch(misassSeq->misassKind)
 							{
-								case ERR_MISJOIN: strcpy(misKindStr, "err_misjoin"); break;
-								case ERR_INSERT: strcpy(misKindStr, "err_insertion"); break;
-								case ERR_DEL: strcpy(misKindStr, "err_deletion"); break;
-								default: printf("line=%d, In %s(), invalid error kind=%d, error!\n", __LINE__, __func__, misassSeq->misassKind); return FAILED;
+								case SV_MISJOIN: strcpy(misKindStr, "sv_misjoin"); break;
+								case SV_INSERT: strcpy(misKindStr, "sv_insertion"); break;
+								case SV_DEL: strcpy(misKindStr, "sv_deletion"); break;
+								default: printf("line=%d, In %s(), invalid SV kind=%d, error!\n", __LINE__, __func__, misassSeq->misassKind); return FAILED;
 							}
 
-							fprintf(fpErrors, "%s\t%s\t%d\t%d\t%d\t%d\t%s\n", queryItem->queryTitle, misKindStr, misassSeq->startQueryPos, misassSeq->endQueryPos, misassSeq->startSubjectPos, misassSeq->endSubjectPos, subjectTitle);
-							errNum ++;
-						}else if(misInfo->gapFlag==YES)
+							fprintf(fpSV, "%s\t%s\t%d\t%d\t%d\t%d\t%s\n", queryItem->queryTitle, misKindStr, misassSeq->startQueryPos, misassSeq->endQueryPos, misassSeq->startSubjectPos, misassSeq->endSubjectPos, subjectTitle);
+							svNum ++;
+						}else if(misInfo->misassFlag==UNCERTAIN_MISASS)
 						{
 							switch(misassSeq->misassKind)
 							{
-								case GAP_INSERT: strcpy(misKindStr, "gap_insertion"); break;
-								case GAP_DEL: strcpy(misKindStr, "gap_deletion"); break;
+								case UNCER_MISJOIN: strcpy(misKindStr, "uncertain_misjoin"); break;
+								case UNCER_INSERT: strcpy(misKindStr, "uncertain_insertion"); break;
+								case UNCER_DEL: strcpy(misKindStr, "uncertain_deletion"); break;
 								default: printf("line=%d, In %s(), invalid error kind=%d, error!\n", __LINE__, __func__, misassSeq->misassKind); return FAILED;
 							}
 
-							fprintf(fpGap, "%s\t%s\t%d\t%d\t%d\t%d\t%s\n", queryItem->queryTitle, misKindStr, misassSeq->startQueryPos, misassSeq->endQueryPos, misassSeq->startSubjectPos, misassSeq->endSubjectPos, subjectTitle);
-							gapNum ++;
+							fprintf(fpUncertain, "%s\t%s\t%d\t%d\t%d\t%d\t%s\n", queryItem->queryTitle, misKindStr, misassSeq->startQueryPos, misassSeq->endQueryPos, misassSeq->startSubjectPos, misassSeq->endSubjectPos, subjectTitle);
+							warningNum ++;
 						}else
 						{
-							printf("line=%d, In %s(), invalid situation, error!\n", __LINE__, __func__);
+							printf("line=%d, In %s(), invalid misassFlag=%d, error!\n", __LINE__, __func__, misInfo->misassFlag);
 							return FAILED;
 						}
-
-					}else if(misInfo->misassFlag==STRUCTURE_VARIATION)
-					{
-						switch(misassSeq->misassKind)
-						{
-							case SV_MISJOIN: strcpy(misKindStr, "sv_misjoin"); break;
-							case SV_INSERT: strcpy(misKindStr, "sv_insertion"); break;
-							case SV_DEL: strcpy(misKindStr, "sv_deletion"); break;
-							default: printf("line=%d, In %s(), invalid SV kind=%d, error!\n", __LINE__, __func__, misassSeq->misassKind); return FAILED;
-						}
-
-						fprintf(fpSV, "%s\t%s\t%d\t%d\t%d\t%d\t%s\n", queryItem->queryTitle, misKindStr, misassSeq->startQueryPos, misassSeq->endQueryPos, misassSeq->startSubjectPos, misassSeq->endSubjectPos, subjectTitle);
-						svNum ++;
-					}else if(misInfo->misassFlag==UNCERTAIN_MISASS)
-					{
-						switch(misassSeq->misassKind)
-						{
-							case UNCER_MISJOIN: strcpy(misKindStr, "uncertain_misjoin"); break;
-							case UNCER_INSERT: strcpy(misKindStr, "uncertain_insertion"); break;
-							case UNCER_DEL: strcpy(misKindStr, "uncertain_deletion"); break;
-							default: printf("line=%d, In %s(), invalid error kind=%d, error!\n", __LINE__, __func__, misassSeq->misassKind); return FAILED;
-						}
-
-						fprintf(fpUncertain, "%s\t%s\t%d\t%d\t%d\t%d\t%s\n", queryItem->queryTitle, misKindStr, misassSeq->startQueryPos, misassSeq->endQueryPos, misassSeq->startSubjectPos, misassSeq->endSubjectPos, subjectTitle);
-						warningNum ++;
-					}else
-					{
-						printf("line=%d, In %s(), invalid misassFlag=%d, error!\n", __LINE__, __func__, misInfo->misassFlag);
-						return FAILED;
 					}
-
 					misassSeq = misassSeq->next;
 				}
 
