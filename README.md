@@ -134,15 +134,15 @@ Example:
 ## Output Result Description
 
 Then, misFinder will perform the BLASTN alignment, identify the assembly errors and correct assemblies due to structural variations, and then correct the assembly errors at their breakpoints. Finally, the final results will be output into five files, including four files for the identified mis-assembly information and one file for the corrected assemblies:
-(1) result_errors:
+* result_errors:
     The identified assembly errors.
-(2) result_sv:
+* result_sv:
     The correct assemblies due to structural variations.
-(3) result_gap:
+* result_gap:
     The indel caused by gap regions filled by poly_N.
-(4) result_warning:
+* result_warning:
     The warnings produced by misFinder, they may need further checking.
-(5) query_cor.fa:
+* query_cor.fa:
     The corrected assemblies after performing the correction at the breakpoints of assembly errors.
 
 
