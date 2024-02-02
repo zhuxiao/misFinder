@@ -93,30 +93,30 @@ Commands:
     gen-conf    Create configuration file
 
 Options:
-  1) metrics -- compute the metrics:
-    -m <INT>           The minimal query length. Default is 100.
-    -pt <FLOAT>        The minimal identity percentage for matched queries and 
-                       matched segments. Default is 0.95.
-    -t <INT>           The number of threads for the alignment between queries 
-                       and subjects. Default is the number of CPU cores.
+  1) metrics    -- compute the metrics:
+    -m <INT>        The minimal query length (bp). [100]
+    -pt <FLOAT>     The minimal identity percentage for matched queries and 
+                    matched segments. [0.9]
+    -t <INT>        The number of threads for the alignment between queries 
+                    and subjects. Default is the number of CPU cores.
     -o <STR>
-    -out <STR>         Output directory for the output files. Default is "output".
+    -out <STR>      Output directory for the output files. [output]
     -h
-    -help              Show help information.
-  2) misass -- compute mis-assemblies:
-    -i <INT>           Minimal indel size. Default is 5 bp.
-    -t <INT>           The number of threads for reads alignment. Default is
-                       the number of CPU cores.
-    -sc <INT>          Single-cell paired-end data flag. Default is 0.
-                       0: standard genomic DNA prepared from culture;
-                       1: single-cell data.
+    -help           Show help information.
+  2) misass     -- compute mis-assemblies:
+    -i <INT>        Minimal indel size (bp). [5]
+    -t <INT>        The number of threads for reads alignment. Default is
+                    the number of CPU cores.
+    -sc <INT>       Single-cell paired-end data flag. [0]
+                    0: standard genomic DNA prepared from culture;
+                    1: single-cell data.
     -o <STR>
-    -out <STR>         Output directory for the output files. Default is "output".
+    -out <STR>      Output directory for the output files. [output]
     -h
-    -help              Show help information.
-  3) gen-conf -- create configuration file in current directory:
+    -help           Show help information.
+  3) gen-conf   -- create configuration file in current directory:
     -h
-    -help              Show help information.
+    -help           Show help information.
 
 Example:
   # detect mis-assemblies based on the specified information in 'config' file 
@@ -127,7 +127,6 @@ Example:
 
   # create the 'config' file in current directory
   $ mf gen-conf config
-
 ```
 
 
