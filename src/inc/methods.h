@@ -370,6 +370,7 @@ short outputNewSeqInfo(query_t *queryItem);
 short extractMisReg(queryMatchInfo_t *queryMatchInfoSet);
 short extractMisRegSingleQuery(query_t *queryItem, subject_t *subjectArray);
 short addMisassSeqNodeToMisInfoNode(misInfo_t *misInfo, int32_t misassKind, int32_t subjectID, int32_t startQueryPos, int32_t endQueryPos, int32_t startSubjectPos, int32_t endSubjectPos);
+short validateMisRegQueryEnd(queryMatchInfo_t *queryMatchInfoSet);
 
 // ================= circosData.cpp ====================
 short generateCircosData(queryMatchInfo_t *queryMatchInfoSet, readSet_t *readSet);

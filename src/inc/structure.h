@@ -164,7 +164,7 @@ typedef struct queryMatchInfoNode
 	subject_t *subjectArray;
 	matchItem_t *matchItemArray;
 	int64_t itemNumQueryArray, itemNumSubjectArray, itemNumMatchItemArray;
-	int32_t potentMisassNum, trueMisassNum, SVNum;
+	int32_t potentMisassNum, shortQueryNum, trueMisassNum, SVNum;
 	int64_t maxQueryID, secQueryID;
 }queryMatchInfo_t;
 
@@ -526,6 +526,7 @@ typedef struct misassSeqNode
 {
 	int32_t startQueryPos, endQueryPos, misassKind;	// misasskind: ERR_MISJOIN, ERR_INSERT, ERR_DEL, COR_SV, ERR_UNCERTAIN
 	int32_t subjectID, startSubjectPos, endSubjectPos;
+	bool valid_flag;
 	struct misassSeqNode *next;
 }misassSeq_t;
 
