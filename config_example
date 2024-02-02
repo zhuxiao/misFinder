@@ -7,10 +7,11 @@ END
 
 REF
 # Reference segments in fasta format.
-/home/user/misass/misFinder/spombe/refs/NC_004324.fasta
-/home/user/misass/misFinder/spombe/refs/NC_004323.fasta
-/home/user/misass/misFinder/spombe/refs/NC_004321.fasta
-/home/user/misass/misFinder/spombe/refs/NC_001326.fasta
+/home/user/misass/misFinder/spombe/refs/GCF_000002945.1_ASM294v2_genomic.fa
+#/home/user/misass/misFinder/spombe/refs/NC_003424.3.fa
+#/home/user/misass/misFinder/spombe/refs/NC_003423.3.fa
+#/home/user/misass/misFinder/spombe/refs/NC_003421.2.fa
+#/home/user/misass/misFinder/spombe/refs/NC_001326.1.fa
 END
 
 READS
