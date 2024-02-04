@@ -100,56 +100,86 @@ short initAlignFiles(char *perfectQueryFile, char *matchedQueryFile, char *disju
  */
 short generateBlastnResult(const char *outputPathStr, const char *inputBlastnFile, const char *inputQueryFile, const char *mergedSegFile, int32_t threadNum)
 {
-	if(threadNum==1)
-	{
-		if(generateBlastnResultNoThread(inputBlastnFile, inputQueryFile, mergedSegFile)==FAILED)
-		{
-			printf("line=%d, In %s(), cannot generate the alignment result, error.\n", __LINE__, __func__);
-			return FAILED;
-		}
-	}else
-	{
-		// initialize the thread parameters
-		if(initThreadParasBlastn(&threadArr, &threadParaArr, threadNum, outputPathStr, mergedSegFile)==FAILED)
-		{
-			printf("line=%d, In %s(), cannot initialize the thread parameters, error.\n", __LINE__, __func__);
-			return FAILED;
-		}
+	string cmd1, cmd2, outputPathStr_tmp, queryFileName, subjectFileName, blastnFileName;
+	string blastdb_name;
+	int returnCode;
 
-		// divide the query files
-		if(divideQueryFiles(threadParaArr, threadNum, inputQueryFile)==FAILED)
-		{
-			printf("line=%d, In %s(), cannot generate the sub-query files, error.\n", __LINE__, __func__);
-			return FAILED;
-		}
+	outputPathStr_tmp = outputPathStr;
+	queryFileName = inputQueryFile;
+	subjectFileName = mergedSegFile;
+	blastnFileName = inputBlastnFile;
+	if(outputPathStr_tmp.at(outputPathStr_tmp.size()-1)=='/')
+		blastdb_name = outputPathStr_tmp + "ref_blastdb";
+	else
+		blastdb_name = outputPathStr_tmp + "/" + "ref_blastdb";
 
-		// create threads to do the alignment
-		if(createThreadsBlastn(threadArr, threadParaArr, threadNum)==FAILED)
-		{
-			printf("line=%d, In %s(), cannot create threads, error.\n", __LINE__, __func__);
-			return FAILED;
-		}
+	cmd1 = "makeblastdb -dbtype nucl -in " + subjectFileName + " -out " + blastdb_name + " > /dev/null 2>&1";
+	cmd2 = "blastn -query " + queryFileName + " -db " + blastdb_name + " -num_threads " + to_string(threadNum) + " -out " + blastnFileName + " -num_alignments 100 -best_hit_overhang 0.1 > /dev/null 2>&1";
 
-		if(waitThreads(threadArr, threadParaArr, threadNum)==FAILED)
-		{
-			printf("line=%d, In %s(), cannot wait threads, error.\n", __LINE__, __func__);
-			return FAILED;
-		}
+	cout << "cmd1=" << cmd1 << endl;
+	cout << "cmd2=" << cmd2 << endl;
 
-		// merge the alignment file into a whole one
-		if(mergeBlastnResults(inputBlastnFile, threadParaArr, threadNum)==FAILED)
-		{
-			printf("line=%d, In %s(), cannot merge blastn results, error.\n", __LINE__, __func__);
-			return FAILED;
-		}
-
-		// free memory for thread parameters
-		if(freeThreadParasBlastn(&threadArr, &threadParaArr, threadNum)==FAILED)
-		{
-			printf("line=%d, In %s(), cannot free the thread parameters, error.\n", __LINE__, __func__);
-			return FAILED;
-		}
+	returnCode = system(cmd1.c_str());
+	if(returnCode!=0){
+		printf("Please run the correct 'makeblastdb' command or check whether the 'makeblastdb' was correctly installed.\n");
+		return FAILED;
 	}
+	returnCode = system(cmd2.c_str());
+	if(returnCode!=0){
+		printf("Please run the correct 'blastn' command or check whether the 'blastn' was correctly installed.\n");
+		return FAILED;
+	}
+
+//	if(threadNum==1)
+//	{
+//		if(generateBlastnResultNoThread(inputBlastnFile, inputQueryFile, mergedSegFile)==FAILED)
+//		{
+//			printf("line=%d, In %s(), cannot generate the alignment result, error.\n", __LINE__, __func__);
+//			return FAILED;
+//		}
+//	}else
+//	{
+//		// initialize the thread parameters
+//		if(initThreadParasBlastn(&threadArr, &threadParaArr, threadNum, outputPathStr, mergedSegFile)==FAILED)
+//		{
+//			printf("line=%d, In %s(), cannot initialize the thread parameters, error.\n", __LINE__, __func__);
+//			return FAILED;
+//		}
+//
+//		// divide the query files
+//		if(divideQueryFiles(threadParaArr, threadNum, inputQueryFile)==FAILED)
+//		{
+//			printf("line=%d, In %s(), cannot generate the sub-query files, error.\n", __LINE__, __func__);
+//			return FAILED;
+//		}
+//
+//		// create threads to do the alignment
+//		if(createThreadsBlastn(threadArr, threadParaArr, threadNum)==FAILED)
+//		{
+//			printf("line=%d, In %s(), cannot create threads, error.\n", __LINE__, __func__);
+//			return FAILED;
+//		}
+//
+//		if(waitThreads(threadArr, threadParaArr, threadNum)==FAILED)
+//		{
+//			printf("line=%d, In %s(), cannot wait threads, error.\n", __LINE__, __func__);
+//			return FAILED;
+//		}
+//
+//		// merge the alignment file into a whole one
+//		if(mergeBlastnResults(inputBlastnFile, threadParaArr, threadNum)==FAILED)
+//		{
+//			printf("line=%d, In %s(), cannot merge blastn results, error.\n", __LINE__, __func__);
+//			return FAILED;
+//		}
+//
+//		// free memory for thread parameters
+//		if(freeThreadParasBlastn(&threadArr, &threadParaArr, threadNum)==FAILED)
+//		{
+//			printf("line=%d, In %s(), cannot free the thread parameters, error.\n", __LINE__, __func__);
+//			return FAILED;
+//		}
+//	}
 
 	return SUCCESSFUL;
 }
@@ -918,7 +948,7 @@ void* generateBlastnResultThread(void *arg)
 	queryFileName = threadPara->queryFileName;
 	subjectFileName = threadPara->subjectFileName;
 	blastnFileName = threadPara->blastnFileName;
-	cmd = "blastn -query " + queryFileName + " -subject " + subjectFileName + " -out " + blastnFileName + " -num_alignments 100 -best_hit_overhang 0.2";
+	cmd = "blastn -query " + queryFileName + " -subject " + subjectFileName + " -out " + blastnFileName + " -num_alignments 100 -best_hit_overhang 0.1";
 
 //	char blastnCommand[LINE_CHAR_MAX+1];
 //	char queryOption[LINE_CHAR_MAX+1];
