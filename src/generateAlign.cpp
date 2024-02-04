@@ -912,35 +912,41 @@ short waitThreads(pthread_t *threadArray, threadPara_t *threadParaArray, int32_t
 void* generateBlastnResultThread(void *arg)
 {
 	threadPara_t *threadPara = (threadPara_t *)arg;
-
+	string cmd, queryFileName, subjectFileName, blastnFileName;
 	int returnCode;
-	char blastnCommand[LINE_CHAR_MAX+1];
-	char queryOption[LINE_CHAR_MAX+1];
-	char subjectOption[LINE_CHAR_MAX+1];
-	char outputOption[LINE_CHAR_MAX+1];
-	char ctrlOption[LINE_CHAR_MAX+1];
 
-	strcpy(queryOption, "-query ");
-	strcat(queryOption, threadPara->queryFileName);
-	strcpy(subjectOption, "-subject ");
-	strcat(subjectOption, threadPara->subjectFileName);
-	strcpy(outputOption, "-out ");
-	strcat(outputOption, threadPara->blastnFileName);
-	strcpy(ctrlOption, "-best_hit_overhang 0.1");
+	queryFileName = threadPara->queryFileName;
+	subjectFileName = threadPara->subjectFileName;
+	blastnFileName = threadPara->blastnFileName;
+	cmd = "blastn -query " + queryFileName + " -subject " + subjectFileName + " -out " + blastnFileName + " -num_alignments 100 -best_hit_overhang 0.2";
 
-	strcpy(blastnCommand, "blastn");
-	strcat(blastnCommand, " ");
-	strcat(blastnCommand, queryOption);
-	strcat(blastnCommand, " ");
-	strcat(blastnCommand, subjectOption);
-	strcat(blastnCommand, " ");
-	strcat(blastnCommand, ctrlOption);
-	strcat(blastnCommand, " ");
-	strcat(blastnCommand, outputOption);
+//	char blastnCommand[LINE_CHAR_MAX+1];
+//	char queryOption[LINE_CHAR_MAX+1];
+//	char subjectOption[LINE_CHAR_MAX+1];
+//	char outputOption[LINE_CHAR_MAX+1];
+//	char ctrlOption[LINE_CHAR_MAX+1];
+//
+//	strcpy(queryOption, "-query ");
+//	strcat(queryOption, threadPara->queryFileName);
+//	strcpy(subjectOption, "-subject ");
+//	strcat(subjectOption, threadPara->subjectFileName);
+//	strcpy(outputOption, "-out ");
+//	strcat(outputOption, threadPara->blastnFileName);
+//	strcpy(ctrlOption, "-best_hit_overhang 0.1");
+//
+//	strcpy(blastnCommand, "blastn");
+//	strcat(blastnCommand, " ");
+//	strcat(blastnCommand, queryOption);
+//	strcat(blastnCommand, " ");
+//	strcat(blastnCommand, subjectOption);
+//	strcat(blastnCommand, " ");
+//	strcat(blastnCommand, ctrlOption);
+//	strcat(blastnCommand, " ");
+//	strcat(blastnCommand, outputOption);
 
-	//printf("BLASTN command: %s\n", blastnCommand);
+	//cout <<"BLASTN command: " << cmd << endl;
 
-	returnCode = system(blastnCommand);
+	returnCode = system(cmd.c_str());
 	if(returnCode==0)
 	{
 		threadPara->successFlag = SUCCESSFUL;
@@ -985,7 +991,7 @@ short generateBlastnResultNoThread(const char *inputBlastnFile, const char *inpu
 	strcat(blastnCommand, " ");
 	strcat(blastnCommand, outputOption);
 
-	//printf("BLASTN command: %s\n", blastnCommand);
+	printf("BLASTN command: %s\n", blastnCommand);
 
 	returnCode = system(blastnCommand);
 	if(returnCode!=0)

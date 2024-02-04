@@ -26,6 +26,37 @@ vector<string> split(const string& s, const string& delim)
 	return elems;
 }
 
+bool isFileExist(const string &filename){
+	bool flag = false;
+	struct stat fileStat;
+	if (stat(filename.c_str(), &fileStat) == 0)
+		if(fileStat.st_size>0)
+			flag = true;
+	return flag;
+}
+
+// copy single file
+int copySingleFile(const string &infilename, ofstream &outfile){
+	ifstream infile;
+	string line;
+
+	if(isFileExist(infilename)==false) return 0;
+
+	infile.open(infilename);
+	if(!infile.is_open()){
+		cerr << __func__ << ", line=" << __LINE__ << ": cannot open file:" << infilename << endl;
+		exit(1);
+	}
+	// read each line and save to the output file
+	while(getline(infile, line))
+		if(line.size()>0 and line.at(0)!='#'){
+			outfile << line << endl;
+		}
+	infile.close();
+
+	return 0;
+}
+
 /**
  * Output the linked segments of queries.
  *  @return:

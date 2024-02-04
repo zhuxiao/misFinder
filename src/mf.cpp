@@ -209,11 +209,13 @@ short initGlobalParas(int32_t operationMode, char *outputPathName, char *configF
 		}
 	}
 
-	printf("Minimal contig size     : %d\n", minQueryLenThres);
-	printf("Match percent threshold : %.2f\n", matchPercentThres);
-	printf("Minimal indel size      : %d\n", indelSizeThres);
-	printf("Single-cell data flag   : %d\n", singleCellFlag);
-	printf("Thread number           : %d\n", threadNum);
+	printf("Output directory       : %s\n", outputPathStr);
+	printf("Configuration file     : %s\n", configFile);
+	printf("Minimal contig size    : %d\n", minQueryLenThres);
+	printf("Match percent threshold: %.2f\n", matchPercentThres);
+	printf("Minimal indel size     : %d\n", indelSizeThres);
+	printf("Single-cell data flag  : %d\n", singleCellFlag);
+	printf("Number of threads      : %d\n", threadNum);
 
 	return SUCCESSFUL;
 }
@@ -310,7 +312,7 @@ short generateConfigFile(const string &configFile){
 	outfile << "#/home/user/misass/misFinder/spombe/refs/NC_001326.1.fa" << endl;
 	outfile << "END" << endl << endl;
 
-	outfile << "REF" << endl;
+	outfile << "READS" << endl;
 	outfile << "# Paired-end reads in fastq or fasta format." << endl;
 	outfile << "PE=/home/user/misass/misFinder/spombe/reads/paired_reads_1.fastq" << "\t" << "/home/user/misass/misFinder/spombe/reads/paired_reads_2.fastq" << endl;
 	outfile << "#PE=/home/user/misass/misFinder/spombe/reads/paied_reads.fastq" << endl;

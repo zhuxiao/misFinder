@@ -183,57 +183,34 @@ short getSegmentFileNum(int32_t *segmentFileNum, const char *subjectsFileName)
  */
 short mergeRefSegsFasta(const char *mergedSegFile, char **segFileArr, int64_t segFileNum)
 {
-	FILE *fpMergedSeg;
-	int64_t i, maxFileSizeByte, bufLen;
-	char *segBuf;
+	int64_t i;
+	ofstream outfile_merged;
 
-	fpMergedSeg = fopen(mergedSegFile, "w");
-	if(fpMergedSeg==NULL)
-	{
-		printf("line=%d, In %s(), cannot open file [ %s ], error!\n", __LINE__, __func__, mergedSegFile);
-		return FAILED;
-	}
-
-	if(getMaxFileSizeByte(&maxFileSizeByte, segFileArr, segFileNum)==FAILED)
-	{
-		printf("line=%d, In %s(), cannot get the maximal file size, error!\n", __LINE__, __func__);
-		return FAILED;
-	}
-
-	segBuf = (char *) malloc (maxFileSizeByte * sizeof(char));
-	if(segBuf==NULL)
-	{
-		printf("line=%d, In %s(), cannot allocate memory, error!\n", __LINE__, __func__);
-		return FAILED;
+	outfile_merged.open(mergedSegFile);
+	if(!outfile_merged.is_open()){
+		cerr << __func__ << ", line=" << __LINE__ << ": cannot open file:" << mergedSegFile << endl;
+		exit(1);
 	}
 
 	for(i=0; i<segFileNum; i++)
 	{
-		// fill the segment buffer
-		if(fillSegBuf(segBuf, &bufLen, segFileArr[i])==FAILED)
-		{
-			printf("line=%d, In %s(), cannot fill segment buffer, error!\n", __LINE__, __func__);
-			return FAILED;
-		}
+		copySingleFile(segFileArr[i], outfile_merged);
 
-		if(bufLen>0)
-		{
-			// trim the tail non-base characters
-			if(filterTailNonBases(segBuf, &bufLen)==FAILED)
-			{
-				printf("line=%d, In %s(), cannot filter the tail non-base characters of segment buffer, error!\n", __LINE__, __func__);
-				free(segBuf); segBuf = NULL;
-				return FAILED;
-			}
-
-			fprintf(fpMergedSeg, "%s\n", segBuf);
-		}
+//		if(bufLen>0)
+//		{
+//			// trim the tail non-base characters
+//			if(filterTailNonBases(segBuf, &bufLen)==FAILED)
+//			{
+//				printf("line=%d, In %s(), cannot filter the tail non-base characters of segment buffer, error!\n", __LINE__, __func__);
+//				free(segBuf); segBuf = NULL;
+//				return FAILED;
+//			}
+//
+//			fprintf(fpMergedSeg, "%s\n", segBuf);
+//		}
 	}
 
-	free(segBuf);
-	segBuf = NULL;
-	fclose(fpMergedSeg);
-	fpMergedSeg = NULL;
+	outfile_merged.close();
 
 	return SUCCESSFUL;
 }

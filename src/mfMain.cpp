@@ -304,10 +304,10 @@ short parseCommandParasAndExe(int argc, char **argv)
 			}
 		}
 
-		// process no_arg_opt_vec
+		// process no_arg_opt_vec: config file
 		if(no_arg_opt_vec.size()==1){
 			strcpy(configFilePara, no_arg_opt_vec.at(0).c_str());
-			outputDirPara[no_arg_opt_vec.at(0).size()] = '\0';
+			configFilePara[no_arg_opt_vec.at(0).size()] = '\0';
 		}else if(no_arg_opt_vec.size()>1){
 			for(i=0; i<(int32_t)no_arg_opt_vec.size(); i++)
 				printf("%s : invalid argument\n", argv[i]);
@@ -318,7 +318,7 @@ short parseCommandParasAndExe(int argc, char **argv)
 		if(strlen(configFilePara)==0){
 			if(operationMode==OPERATION_MODE_GENCONF){
 				strcpy(configFilePara, CONFIGFILENAME_DEFAULT);
-				outputDirPara[strlen(CONFIGFILENAME_DEFAULT)] = '\0';
+				configFilePara[strlen(CONFIGFILENAME_DEFAULT)] = '\0';
 			}else{
 				printf("Exception: please specify the correct configuration file.\n");
 				return FAILED;
@@ -340,11 +340,11 @@ short parseCommandParasAndExe(int argc, char **argv)
 				return ERROR;
 			}
 		}else{ // create configuration file
-			if(generateConfigFile(configFilePara)==FAILED){
+			if(generateConfigFile(configFile)==FAILED){
 				printf("line=%d, In %s(), cannot show the usage information, error!\n", __LINE__, __func__);
 				return FAILED;
 			}else{
-				cout << "Configuration file '" << configFilePara << "' is generated successfully." << endl;
+				cout << "Configuration file '" << configFile << "' is generated successfully." << endl;
 				return SUCCESSFUL;
 			}
 		}
@@ -376,35 +376,26 @@ short showUsageInfo()
 	printf("    gen-conf    Create configuration file\n\n");
 
 	printf("Options:\n");
+	printf("    -t <INT>        The number of threads. Default is the number of CPU cores.\n");
+	printf("    -o|-out <STR>   Output directory. [%s]\n", OUTPUT_DIR_DEFAULT);
+	printf("    -v              Show version information.\n");
+	printf("    -h|-help        Show this help information and exit.\n\n");
 
+	printf("Command Options:\n");
 	printf("  1) metrics    -- compute the metrics:\n");
 	printf("    -m <INT>        The minimal query length (bp). [%d]\n", MIN_QUERY_LEN_THRES);
 	printf("    -pt <FLOAT>     The minimal identity percentage for matched queries and \n"
 		   "                    matched segments. [%g]\n", MATCHED_PERCENT_THRES);
-	printf("    -t <INT>        The number of threads for the alignment between queries \n"
-		   "                    and subjects. Default is the number of CPU cores.\n");
-	printf("    -o <STR>\n");
-	printf("    -out <STR>      Output directory for the output files. [%s]\n", OUTPUT_DIR_DEFAULT);
-	printf("    -h\n");
-	printf("    -help           Show help information.\n");
 
 	printf("  2) misass     -- compute mis-assemblies:\n");
 	printf("    -i <INT>        Minimal indel size (bp). [%d]\n", INDEL_SIZE_DEFAULT);
-	printf("    -t <INT>        The number of threads for reads alignment. Default is\n"
-		   "                    the number of CPU cores.\n");
 	printf("    -sc <INT>       Single-cell paired-end data flag. [0]\n"
 		   "                    0: standard genomic DNA prepared from culture;\n"
 		   "                    1: single-cell data.\n");
-	printf("    -o <STR>\n");
-	printf("    -out <STR>      Output directory for the output files. [%s]\n", OUTPUT_DIR_DEFAULT);
-	printf("    -h\n");
-	printf("    -help           Show help information.\n");
 
-	printf("  3) gen-conf   -- create configuration file in current directory:\n");
-	printf("    -h\n");
-	printf("    -help           Show help information.\n");
+	printf("  3) gen-conf   -- create configuration file in current directory:\n\n");
 
-	printf("\nExample:\n");
+	printf("Example:\n");
 	printf("  # detect mis-assemblies based on the specified information in 'config' file \n");
 	printf("  $ mf all -o output config\n\n");
 
