@@ -1181,65 +1181,58 @@ short getKmerBaseByInt(char *baseSeq, uint64_t *kmerSeqInt, int32_t entriesPerKm
  *  @return:
  *  	If succeeds, return SUCCESSFUL; otherwise, return FAILED.
  */
-short fillQueries(queryMatchInfo_t *queryMatchInfoSet, char *inputQueryFile)
-{
-	int64_t maxQueryLen, queryID, queryLen, returnFlag;
+short fillQueries(queryMatchInfo_t *queryMatchInfoSet, char *inputQueryFile){
+	int64_t maxQueryLen, queryID, queryLen, returnFlag, itemNumQueryArray;
 	query_t *queryArray;
 	char *querySeq, queryHeadTitle[1000], *pch;
 	FILE *fpQuery;
 
 	fpQuery = fopen(inputQueryFile, "r");
-	if(fpQuery==NULL)
-	{
+	if(fpQuery==NULL){
 		printf("line=%d, In %s(), cannot open file [ %s ], error!\n", __LINE__, __func__, inputQueryFile);
 		return FAILED;
 	}
 
-	if(getMaxQueryLenFromFile(&maxQueryLen, inputQueryFile)==FAILED)
-	{
+	if(getMaxQueryLenFromFile(&maxQueryLen, inputQueryFile)==FAILED){
 		printf("line=%d, In %s(), cannot get the maximal query length, error!\n", __LINE__, __func__);
 		return FAILED;
 	}
 
 	querySeq = (char *) malloc ((maxQueryLen+1)*sizeof(char));
-	if(querySeq==NULL)
-	{
+	if(querySeq==NULL){
 		printf("line=%d, In %s(), cannot allocate memory, error!\n", __LINE__, __func__);
 		return FAILED;
 	}
 
 	queryArray = queryMatchInfoSet->queryArray;
+	itemNumQueryArray = queryMatchInfoSet->itemNumQueryArray;
 
 	queryID = 1;
-	while((returnFlag=getSingleFastaItemFromFile(fpQuery, queryHeadTitle, querySeq, &queryLen))==SUCCESSFUL)
-	{
+	while((returnFlag=getSingleFastaItemFromFile(fpQuery, queryHeadTitle, querySeq, &queryLen))==SUCCESSFUL){
 		pch = queryHeadTitle;
-		while(*pch)
-		{
-			if((*pch)=='\t')
-			{
+		while(*pch){
+			if((*pch)=='\t'){
 				*pch = '\0';
 				break;
 			}
 			pch ++;
 		}
 
-		if(strcmp(queryHeadTitle, queryArray[queryID-1].queryTitle)==0)
-		{
-			queryArray[queryID-1].querySeq = (char*) calloc (queryArray[queryID-1].queryLen+1, sizeof(char));
-			if(queryArray[queryID-1].querySeq==NULL)
-			{
-				printf("line=%d, In %s(), cannot allocate memory, error!\n", __LINE__, __func__);
-				return FAILED;
+		if(queryID<=itemNumQueryArray){
+			if(strcmp(queryHeadTitle, queryArray[queryID-1].queryTitle)==0){
+				queryArray[queryID-1].querySeq = (char*) calloc (queryArray[queryID-1].queryLen+1, sizeof(char));
+				if(queryArray[queryID-1].querySeq==NULL){
+					printf("line=%d, In %s(), cannot allocate memory, error!\n", __LINE__, __func__);
+					return FAILED;
+				}
+				strcpy(queryArray[queryID-1].querySeq, querySeq);
+				queryID ++;
 			}
-			strcpy(queryArray[queryID-1].querySeq, querySeq);
-			queryID ++;
+//			else{
+//				printf("line=%d, In %s(), cannot get the potential mis-assembled queries, error!\n", __LINE__, __func__);
+//			//	return FAILED;
+//			}
 		}
-//		else
-//		{
-//			printf("line=%d, In %s(), cannot get the potential mis-assembled queries, error!\n", __LINE__, __func__);
-//		//	return FAILED;
-//		}
 	}
 
 	free(querySeq);
