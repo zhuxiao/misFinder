@@ -384,6 +384,8 @@ short generateResultCircosDataSingleQuery(FILE *fpResult, char *queryLabel, quer
 
 // ================= util.cpp ====================
 vector<string> split(const string& s, const string& delim);
+bool isFileExist(const string &filename);
+int copySingleFile(const string &infilename, ofstream &outfile);
 short outputLinkedSegments(querySubject_t *pQuerySubject, int headRowSegmentLinkArray, int tailRowSegmentLinkArray, int itemNumSegmentLinkArray, segmentLink_t *segmentLinkArray, matchItem_t *matchItemArray);
 short outputQueryMatchInfoText(char *tmpQueryMatchFile, query_t *queryArray, matchItem_t *matchItemArray, int64_t itemNumQueryArray, subject_t *subjectArray);
 short checkRefCoveredRatio(metrics_t *queryMetrics, subject_t *subjectArray, int64_t itemNumSubjectArray, query_t *queryArray, int64_t itemNumQueryArray);
